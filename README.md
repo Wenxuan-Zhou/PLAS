@@ -32,3 +32,13 @@ python main.py --env_name walker2d-medium-v0 --algo_name Latent --vae_mode v3
 This command will load the vae models under the "models/vae_v3" folder according to the name of the dataset and the random seeds automatically.
 
 The results will be saved under the "results" folder. You may use [viskit](https://github.com/vitchyr/viskit) to visualize the curves.
+
+## Citation
+```
+@inproceedings{PLAS_corl2020,
+ title={PLAS: Latent Action Space for Offline Reinforcement Learning},
+ author={Zhou, Wenxuan and Bajracharya, Sujay and Held, David},
+ booktitle={Conference on Robot Learning},
+ year={2020}
+}
+```
