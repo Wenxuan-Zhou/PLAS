@@ -12,6 +12,8 @@ from logger import logger, setup_logger
 import d4rl
 import torch
 import time
+from eval_functions import eval_critic
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 # Runs policy for X episodes and returns average reward
@@ -41,20 +43,20 @@ if __name__ == "__main__":
     parser.add_argument('--log_dir', default='./results/', type=str)    # Logging directory
     parser.add_argument("--load_model", default=None, type=str)         # Load model and optimizer parameters
     parser.add_argument("--save_model", default=True, type=bool)        # Save model and optimizer parameters
-    parser.add_argument("--save_freq", default=1e5, type=float)         # How often it saves the model
+    parser.add_argument("--save_freq", default=1e5, type=int)           # How often it saves the model
     parser.add_argument("--env_name", default="walker2d-medium-v0")     # OpenAI gym environment name
-    parser.add_argument("--algo_name", default="Latent")                # Algorithm: Latent or LatentPerturbation
+    parser.add_argument("--algo_name", default="Latent")                # Algorithm: Latent or LatentPerturbation.
     parser.add_argument("--dataset", default=None, type=str)            # path to dataset if not d4rl env
     parser.add_argument("--seed", default=0, type=int)                  # Sets Gym, PyTorch and Numpy seeds
-    parser.add_argument("--eval_freq", default=1e3, type=float)         # How often (time steps) we evaluate
-    parser.add_argument("--max_timesteps", default=5e5, type=float)     # Max time steps to run environment for
+    parser.add_argument("--eval_freq", default=1e3, type=int)           # How often (time steps) we evaluate
+    parser.add_argument("--max_timesteps", default=5e5, type=int)       # Max time steps to run environment for
     parser.add_argument('--vae_mode', default='train', type=str)		# VAE mode: train or load from a specific version
+    parser.add_argument('--vae_lr', default=1e-4, type=float)		    # vae training iterations
     parser.add_argument('--vae_itr', default=500000, type=int)		    # vae training iterations
     parser.add_argument('--vae_hidden_size', default=750, type=int)		# vae training iterations
-    parser.add_argument('--max_latent_action', default=2, type=float)   # max action of the latent policy
+    parser.add_argument('--max_latent_action', default=2., type=float)  # max action of the latent policy
     parser.add_argument('--phi', default=0., type=float)	            # max perturbation
-    parser.add_argument('--batch_size', default=100, type=int)	        # batch size"Latent" is the latent policy and "LatentPerturbation" is the latent policy with the perturbation layer.
-
+    parser.add_argument('--batch_size', default=100, type=int)	        # batch size
     parser.add_argument('--actor_lr', default=1e-4, type=float)	        # policy learning rate
     parser.add_argument('--critic_lr', default=1e-3, type=float)	    # policy learning rate
     parser.add_argument('--tau', default=0.005, type=float)	            # actor network size
@@ -142,6 +144,9 @@ if __name__ == "__main__":
         info = eval_policy(policy, env)
         evaluations.append(info['AverageReturn'])
         np.save(os.path.join(folder_name, 'eval'), evaluations)
+        eval_dict = eval_critic(policy.select_action, policy.critic.q1, env)
+        for k, v in eval_dict.items():
+            logger.record_tabular('Eval_critic/'+k, v)
 
         for k, v in info.items():
             logger.record_tabular(k, v)

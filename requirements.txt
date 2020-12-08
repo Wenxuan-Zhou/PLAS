@@ -1,0 +1,6 @@
+torch==1.2.0
+lockfile
+mujoco-py==2.0.2.13
+gym==0.13
+git+https://github.com/rail-berkeley/d4rl@87d13f172aa253004caa32b24df0ce449328f3b3#egg=d4rl
+python-dateutil==2.8.1
