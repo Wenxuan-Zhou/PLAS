@@ -19,7 +19,6 @@ from collections import OrderedDict
 from numbers import Number
 import os
 
-# We need rlkit for this
 from tabulate import tabulate
 import dateutil.tz
 import os.path as osp
